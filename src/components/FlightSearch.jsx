@@ -26,28 +26,43 @@ const FlightSearch = () => {
   };
 
   return (
+  <div>
+    <h2>Flight Search</h2>
+    <input
+      type="text"
+      placeholder="From"
+      value={searchParams.from}
+      onChange={(e) => setSearchParams({ ...searchParams, from: e.target.value })}
+    />
+    <input
+      type="text"
+      placeholder="To"
+      value={searchParams.to}
+      onChange={(e) => setSearchParams({ ...searchParams, to: e.target.value })}
+    />
+    <input
+      type="date"
+      value={searchParams.date}
+      onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
+    />
+    <button onClick={fetchFlights}>Search Flights</button>
+
     <div>
-      <h2>Flight Search</h2>
-      <input
-        type="text"
-        placeholder="From"
-        value={searchParams.from}
-        onChange={(e) => setSearchParams({ ...searchParams, from: e.target.value })}
-      />
-      <input
-        type="text"
-        placeholder="To"
-        value={searchParams.to}
-        onChange={(e) => setSearchParams({ ...searchParams, to: e.target.value })}
-      />
-      <input
-        type="date"
-        value={searchParams.date}
-        onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
-      />
-      <button onClick={fetchFlights}>Search Flights</button>
+      {flights.length > 0 ? (
+        flights.map((flight, index) => (
+          <div key={index}>
+            <p><strong>Airline:</strong> {flight.airline}</p>
+            <p><strong>Departure:</strong> {flight.departureTime}</p>
+            <p><strong>Arrival:</strong> {flight.arrivalTime}</p>
+            <p><strong>Price:</strong> {flight.price}</p>
+          </div>
+        ))
+      ) : (
+        <p>No flights found.</p>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default FlightSearch;
