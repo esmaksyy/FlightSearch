@@ -4,8 +4,10 @@ import axios from "axios";
 const FlightSearch = () => {
   const [flights, setFlights] = useState([]);
   const [searchParams, setSearchParams] = useState({ from: "", to: "", date: "" });
-
+  const [loading, setLoading] = useState(false);
+  
   const fetchFlights = async () => {
+    setLoading(true);
     try {
       const response = await axios.get("https://sky-scrapper.p.rapidapi.com/api/flights/search", {
         params: {
@@ -23,6 +25,7 @@ const FlightSearch = () => {
     } catch (error) {
       console.error("Error fetching flights:", error);
     }
+    setLoading(false);
   };
 
   return (
@@ -45,7 +48,9 @@ const FlightSearch = () => {
       value={searchParams.date}
       onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
     />
-    <button onClick={fetchFlights}>Search Flights</button>
+    <button onClick={fetchFlights} disabled={loading}>
+       {loading ? "Searching..." : "Search Flights"}
+    </button>
 
     <div>
       {flights.length > 0 ? (
