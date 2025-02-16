@@ -1,8 +1,29 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const FlightSearch = () => {
   const [flights, setFlights] = useState([]);
   const [searchParams, setSearchParams] = useState({ from: "", to: "", date: "" });
+
+  const fetchFlights = async () => {
+    try {
+      const response = await axios.get("https://sky-scrapper.p.rapidapi.com/api/flights/search", {
+        params: {
+          departure: searchParams.from,
+          arrival: searchParams.to,
+          date: searchParams.date,
+        },
+        headers: {
+          "X-RapidAPI-Key": "096d9014e4msh5ad29341ba07b3cp10e09djsn50f7481ea75c",
+          "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
+        },
+      });
+
+      setFlights(response.data.flights || []);
+    } catch (error) {
+      console.error("Error fetching flights:", error);
+    }
+  };
 
   return (
     <div>
@@ -24,6 +45,7 @@ const FlightSearch = () => {
         value={searchParams.date}
         onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
       />
+      <button onClick={fetchFlights}>Search Flights</button>
     </div>
   );
 };
