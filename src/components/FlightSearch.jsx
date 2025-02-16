@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "./ui/Card";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 const FlightSearch = () => {
   const [flights, setFlights] = useState([]);
@@ -14,11 +14,19 @@ const FlightSearch = () => {
     try {
       const options = {
         method: "GET",
-        url: "https://sky-scrapper.p.rapidapi.com/api/flights/search",
+        url: "https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchFlights",
         params: {
-          departure: searchParams.from,
-          arrival: searchParams.to,
+          originSkyId: searchParams.from,
+          destinationSkyId: searchParams.to,
+          originEntityId: '27544008',
+          destinationEntityId: '27537542',
           date: searchParams.date,
+          cabinClass: "economy",
+          adults: '1',
+          sortBy: 'best',
+          currency: 'USD',
+          market: 'en-US',
+          countryCode: 'US',
         },
         headers: {
           "X-RapidAPI-Key": "096d9014e4msh5ad29341ba07b3cp10e09djsn50f7481ea75c",
@@ -26,7 +34,8 @@ const FlightSearch = () => {
         },
       };
       const response = await axios.request(options);
-      setFlights(response.data.flights || []);
+      const flightData = response.data.data.itineraries || [];
+      setFlights(flightData);
     } catch (error) {
       console.error("Error fetching flights:", error);
     }
@@ -52,17 +61,19 @@ const FlightSearch = () => {
           value={searchParams.date}
           onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
         />
-        <Button onClick={fetchFlights} disabled={loading}>{loading ? "Searching..." : "Search Flights"}</Button>
+        <Button onClick={fetchFlights} disabled={loading}>
+          {loading ? "Searching..." : "Search Flights"}
+        </Button>
       </div>
       <div className="mt-4">
         {flights.length > 0 ? (
           flights.map((flight, index) => (
             <Card key={index} className="p-4 mb-2">
               <CardContent>
-                <p><strong>Airline:</strong> {flight.airline}</p>
-                <p><strong>Departure:</strong> {flight.departureTime}</p>
-                <p><strong>Arrival:</strong> {flight.arrivalTime}</p>
-                <p><strong>Price:</strong> {flight.price}</p>
+                <p><strong>Airline:</strong> {flight.legs[0].carriers.marketing[0].name}</p>
+                <p><strong>Departure:</strong> {new Date(flight.legs[0].departure).toLocaleString()}</p>
+                <p><strong>Arrival:</strong> {new Date(flight.legs[flight.legs.length - 1].arrival).toLocaleString()}</p>
+                <p><strong>Price:</strong> {flight.price.formatted}</p>
               </CardContent>
             </Card>
           ))
